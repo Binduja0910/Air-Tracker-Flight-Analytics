@@ -1,0 +1,19 @@
+{
+  "airportIcao": "UUEE",
+  "fromLocal": "2019-08-21T20:46:51+02:00",
+  "toLocal": "2019-08-21T22:46:51+02:00",
+  "fromUtc": "2019-08-21T17:46:51Z",
+  "toUtc": "2019-08-21T19:46:51Z",
+  "departuresDelayInformation": {
+    "numTotal": 58,
+    "numCancelled": 0,
+    "medianDelay": "00:21:00",
+    "delayIndex": 1.36
+  },
+  "arrivalsDelayInformation": {
+    "numTotal": 55,
+    "numCancelled": 0,
+    "medianDelay": "-00:10:00",
+    "delayIndex": 0.2
+  }
+}
