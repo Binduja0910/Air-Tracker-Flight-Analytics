@@ -16,41 +16,41 @@ def fetch_flights(iata_code: str, start: str, end: str):
     response.raise_for_status()
     return response.json()
 
-def insert_flight(cursor, flight_data: dict):
-    for row in flight_data.keys():
-        for i in range(len(flight_data.get(row))):
-            aircraft_registration = (flight_data.get(row)[i].get("aircraft").get("reg"))
-            flight_number = flight_data.get(row)[i].get("number")
-            origin_iata = flight_data.get(row)[i].get("arrival").get("airport").get("iata")
-            destination_iata = flight_data.get(row)[i].get("arrival").get("airport").get("iata")
-            scheduled_departure = datetime.fromisoformat(flight_data.get(row)[i].get("departure").get("scheduledTimeLocal")).strftime("%Y-%m-%d %H:%M")
-            actual_departure = datetime.fromisoformat(flight_data.get(row)[i].get("departure").get("actualTimeLocal")).strftime("%Y-%m-%d %H:%M")
-            scheduled_arrival = datetime.fromisoformat(flight_data.get(row)[i].get("arrival").get("scheduledTimeLocal")).strftime("%Y-%m-%d %H:%M")
-            actual_arrival = datetime.fromisoformat(flight_data.get(row)[i].get("arrival").get("actualTimeLocal")).strftime("%Y-%m-%d %H:%M")
-            status = flight_data.get(row)[i].get("status")
-            airline_code = flight_data.get(row)[i].get("airline").get("name")
+def insert_flight(cursor, flight_data: dict, origin_context: str = None, destination_context: str = None):
+    """Insert flight data into MySQL flights table (ignoring flight_id)."""
 
-            cursor.execute("""
-                INSERT INTO flights (
-                    flight_number, aircraft_registration, origin_iata, destination_iata,
-                    scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
-                    status, airline_code
-                )
-                VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON DUPLICATE KEY UPDATE
-                    actual_departure = VALUES(actual_departure),
-                    actual_arrival = VALUES(actual_arrival),
-                    status = VALUES(status),
-                    aircraft_registration = VALUES(aircraft_registration),
-                    airline_code = VALUES(airline_code)
-                """,
-                (flight_number, aircraft_registration, origin_iata, destination_iata,
-                scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
-                status, airline_code))
+    # Flight basics
+    flight_number = flight_data.get("number")
+    aircraft_registration = flight_data.get("aircraft", {}).get("reg")
+
+    # Origin/Destination handling
+    origin_iata = flight_data.get("departure", {}).get("airport", {}).get("iata", origin_context)
+    destination_iata = flight_data.get("arrival", {}).get("airport", {}).get("iata", destination_context)
+
+    # Times
+    scheduled_departure = flight_data.get("departure", {}).get("scheduledTimeLocal")
+    actual_departure = flight_data.get("departure", {}).get("actualTimeLocal")
+    scheduled_arrival = flight_data.get("arrival", {}).get("scheduledTimeLocal")
+    actual_arrival = flight_data.get("arrival", {}).get("actualTimeLocal")
+
+    # Status & airline
+    status = flight_data.get("status")
+    airline_code = flight_data.get("airline", {}).get("iata")  # may be None
+
+    # Insert into DB
+    cursor.execute(
+        f"""
+        INSERT INTO flights
+        (flight_number, aircraft_registration, origin_iata, destination_iata,
+         scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, status, airline_code)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """,
+        (flight_number, aircraft_registration, origin_iata, destination_iata,
+         scheduled_departure, actual_departure, scheduled_arrival, actual_arrival, status, airline_code),
+    )
 
 # Airports
 iata_codes = ["DEL", "BLR", "MAA", "AMS", "BOM", "LAX", "JFK", "LHR", "CDG", "HND"]
-
 now = datetime.now()
 start_time = now.strftime("%Y-%m-%dT%H:%M")
 end_time = (now + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M")
