@@ -31,7 +31,7 @@ def insert_flight(cursor, flight_data: dict):
             airline_code = flight_data.get(row)[i].get("airline").get("name")
 
             cursor.execute("""
-                INSERT INTO flights_bk (
+                INSERT INTO flights (
                     flight_number, aircraft_registration, origin_iata, destination_iata,
                     scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
                     status, airline_code
