@@ -17,45 +17,36 @@ def fetch_flights(iata_code: str, start: str, end: str):
     return response.json()
 
 def insert_flight(cursor, flight_data: dict):
-    flight_id = flight_data.get("movement", {}).get("id")
-    flight_number = flight_data.get("number")
-    aircraft_registration = flight_data.get("aircraft", {}).get("reg")
-    origin_iata = flight_data.get("departure", {}).get("airport", {}).get("iata")
-    destination_iata = flight_data.get("arrival", {}).get("airport", {}).get("iata")
-    scheduled_departure = flight_data.get("departure", {}).get("scheduledTimeLocal")
-    actual_departure = flight_data.get("departure", {}).get("actualTimeLocal")
-    scheduled_arrival = flight_data.get("arrival", {}).get("scheduledTimeLocal")
-    actual_arrival = flight_data.get("arrival", {}).get("actualTimeLocal")
-    status = flight_data.get("status")
+    for row in flight_data.keys():
+        for i in range(len(flight_data.get(row))):
+            aircraft_registration = (flight_data.get(row)[i].get("aircraft").get("reg"))
+            flight_number = flight_data.get(row)[i].get("number")
+            origin_iata = flight_data.get(row)[i].get("arrival").get("airport").get("iata")
+            destination_iata = flight_data.get(row)[i].get("arrival").get("airport").get("iata")
+            scheduled_departure = datetime.fromisoformat(flight_data.get(row)[i].get("departure").get("scheduledTimeLocal")).strftime("%Y-%m-%d %H:%M")
+            actual_departure = datetime.fromisoformat(flight_data.get(row)[i].get("departure").get("actualTimeLocal")).strftime("%Y-%m-%d %H:%M")
+            scheduled_arrival = datetime.fromisoformat(flight_data.get(row)[i].get("arrival").get("scheduledTimeLocal")).strftime("%Y-%m-%d %H:%M")
+            actual_arrival = datetime.fromisoformat(flight_data.get(row)[i].get("arrival").get("actualTimeLocal")).strftime("%Y-%m-%d %H:%M")
+            status = flight_data.get(row)[i].get("status")
+            airline_code = flight_data.get(row)[i].get("airline").get("name")
 
-    airline_info = flight_data.get("airline")
-    airline_code = None
-    if isinstance(airline_info, dict):
-        airline_code = airline_info.get("iata")
-    elif isinstance(airline_info, list) and airline_info:
-        airline_code = airline_info[0].get("iata")
-
-    cursor.execute("""
-        INSERT INTO flights (
-            flight_id, flight_number, aircraft_registration, origin_iata, destination_iata,
-            scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
-            status, airline_code
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-
-            actual_departure = VALUES(actual_departure),
-            actual_arrival = VALUES(actual_arrival),
-            status = VALUES(status),
-            aircraft_registration = VALUES(aircraft_registration),
-            airline_code = VALUES(airline_code)
-        """,
-        (
-            flight_id, flight_number, aircraft_registration, origin_iata, destination_iata,
-            scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
-            status, airline_code
-        )
-    )
+            cursor.execute("""
+                INSERT INTO flights_bk (
+                    flight_number, aircraft_registration, origin_iata, destination_iata,
+                    scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
+                    status, airline_code
+                )
+                VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE
+                    actual_departure = VALUES(actual_departure),
+                    actual_arrival = VALUES(actual_arrival),
+                    status = VALUES(status),
+                    aircraft_registration = VALUES(aircraft_registration),
+                    airline_code = VALUES(airline_code)
+                """,
+                (flight_number, aircraft_registration, origin_iata, destination_iata,
+                scheduled_departure, actual_departure, scheduled_arrival, actual_arrival,
+                status, airline_code))
 
 # Airports
 iata_codes = ["DEL", "BLR", "MAA", "AMS", "BOM", "LAX", "JFK", "LHR", "CDG", "HND"]
