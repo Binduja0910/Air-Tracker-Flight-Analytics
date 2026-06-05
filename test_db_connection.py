@@ -7,7 +7,7 @@ def test_connection():
             host="localhost",
             user="root",
             password="Bindu@123",   
-            database="airtracker"
+            database="air_tracker"
         )
         cursor = Connect.cursor()
 
