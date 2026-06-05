@@ -1,3 +1,10 @@
+1. Overview
+This project provides insights into flight operations, aircraft usage, and airport performance using SQL-based analytics. It is designed to help data enthusiasts and developers practice querying, reporting, and building dashboards from aviation datasets.
+-----------------------------------------------------------------------------------------------------
+2. Project Structure
+/data – Raw and cleaned datasets (flights, aircraft, airports) 
+
+
 | ICAO Code | IATA Code | Airport Name                                      | City / Country         |
 | **VIDP**  | DEL       | Indira Gandhi International Airport               | New Delhi, India       |
 | **VOBL**  | BLR       | Kempegowda International Airport                  | Bengaluru, India       |
@@ -10,21 +17,42 @@
 | **LFPG**  | CDG       | Charles de Gaulle Airport                         | Paris, France          |
 | **RJTT**  | HND       | Haneda Airport (Tokyo International Airport)      | Tokyo, Japan           |
 
-------------------------------------------------------------------------------------------------------
 
-Name: streamlit
-Version: 1.58.0
-Summary: A faster way to build and share data apps
-Home-page: https://streamlit.io
-Author: 
-Author-email: Snowflake Inc <hello@streamlit.io>
-License-Expression: Apache-2.0
-Location: C:\Users\91709\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\LocalCache\local-packages\Python312\site-packages
-Requires: altair, anyio, blinker, cachetools, click, gitpython, httptools, itsdangerous, numpy, packaging, pandas, pillow, protobuf, pyarrow, pydeck, python-multipart, requests, starlette, tenacity, toml, typing-extensions, uvicorn, watchdog, websockets
-Required-by:
----------------------------------------------------------------------------------------------------
+/sql – SQL scripts for queries and analysis
 
-cd "C:\Users\91709\Documents\Bindu\DS-C-WE-E-B123\GUVI Projects\Air Tracker_Flight Analytics\App"
-python -m streamlit run app.py
+/reports – Generated outputs, summaries, and visualizations
 
------------------------------------------------------------------------------------------------------
+README.md – Project documentation
+
+----------------------------------------------------------------------------------------------------------
+
+3. Getting Started
+Clone the repository:
+
+Code
+git clone https://github.com/Binduja0910/Air-Tracker-Flight-Analytics
+Import datasets into your SQL environment
+
+Run queries from the /sql folder
+
+Explore results in /reports
+
+----------------------------------------------------------------------------------------------------------
+
+4. Tech Stack
+SQL (MySQL)
+
+Streamlit (for visualization)
+
+GitHub for version control
+
+----------------------------------------------------------------------------------------------------------
+
+5. Example Queries
+Show the total number of flights for each aircraft model
+
+List all aircraft (registration, model) with more than 5 flights
+
+Find top 3 destination airports (name, city) by arrivals
+
+----------------------------------------------------------------------------------------------------------
